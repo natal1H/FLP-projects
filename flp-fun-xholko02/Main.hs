@@ -20,8 +20,8 @@ instance Show BKG where
    show (BKG n t p s) = "BKG = (N, \x03A3, P, S)\n" ++
                         "N = {" ++ intercalate "," (map (:[]) n) ++ "}\n" ++
                         "\x03A3 = {" ++ intercalate "," (map (:[]) t) ++ "}\n" ++
-                        "P = {" ++  intercalate "," (map (\(x, y) -> "(" ++ [x] ++ "," ++ y ++ ")") r) ++ "}\n" ++
-                        "S = " ++ show s
+                        "P = {" ++  intercalate "," (map (\(x, y) -> "(" ++ [x] ++ "," ++ y ++ ")") p) ++ "}\n" ++
+                        "S = " ++ [s]
 
 {-- 
 -- Cmd line arg parsing
@@ -51,14 +51,36 @@ main = do
     action args -- will return IO action
 --}
 
+
+-- Algoritmus 1
+--algoritmus1 :: BKG -> [Symbol]
+--algoritmus1 = ...
+
 -- example grammar
-g :: BKG
-g = BKG { nonterminals="SAB"
+g1 :: BKG
+g1 = BKG { nonterminals="SAB"
         , terminals="abcd"
         , rules=[('S', "#"), ('S', "AB"), ('A', "aAb"), ('A', "ab"), ('B', "cBd"), ('B', "cd")]
         , startSymbol='S'}
+-- accessing: nonterminals g
 
-r = [('S', "#"), ('S', "AB"), ('A', "aAb"), ('A', "ab"), ('B', "cBd"), ('B', "cd")]
+r1 = [('S', "#"), ('S', "AB"), ('A', "aAb"), ('A', "ab"), ('B', "cBd"), ('B', "cd")]
+
+-- Funkcia pre Alg 4.1 - kontrola či alpha in (Ni-1 union Sigma)*
+isRuleInUnion :: Rule -> [Symbol] -> [Symbol] -> Bool
+isRuleInUnion rule_i nonterm_i sigma =
+    let union = nonterm_i ++ sigma ++ ['#']
+    in foldl (\acc x -> acc && x `elem` union) True (snd rule_i)
+
+-- funkcia z Alg 4.1.
+alg41Helper :: [Symbol] -> BKG -> [Symbol]
+alg41Helper n_prev g = foldl (\acc (x,y) -> if isRuleInUnion (x,y) n_prev (terminals g) && x `notElem` n_prev then acc ++ [x] else acc) n_prev (rules g)
+
+alg41 :: [Symbol] -> BKG -> [Symbol]
+alg41 n_prev g
+    | n_prev == n_curr = n_curr -- end of algorithm
+    | otherwise = alg41 n_curr g
+        where n_curr = foldl (\acc (x,y) -> if isRuleInUnion (x,y) n_prev (terminals g) && x `notElem` n_prev then acc ++ [x] else acc) n_prev (rules g)-- vypočítať N_i podľa alg 4.1 krok 2
 
 main = do
     putStrLn "FLP - Simplify"
