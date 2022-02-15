@@ -62,11 +62,17 @@ g1 = BKG { nonterminals="SAB"
         , terminals="abcd"
         , rules=[('S', "#"), ('S', "AB"), ('A', "aAb"), ('A', "ab"), ('B', "cBd"), ('B', "cd")]
         , startSymbol='S'}
--- accessing: nonterminals g
+
+g2 :: BKG
+g2 = BKG { nonterminals="SAB"
+        , terminals="ab"
+        , rules=[('S', "A"), ('S', "a"), ('A', "AB"), ('B', "b")]
+        , startSymbol='S'}
 
 r1 = [('S', "#"), ('S', "AB"), ('A', "aAb"), ('A', "ab"), ('B', "cBd"), ('B', "cd")]
 
 -- Funkcia pre Alg 4.1 - kontrola či alpha in (Ni-1 union Sigma)*
+-- TODO - prerobiť, že vstup iba alpha, nie A->alpha, lebo isRuleFromSet kontroluje aj A
 isRuleInUnion :: Rule -> [Symbol] -> [Symbol] -> Bool
 isRuleInUnion rule_i nonterm_i sigma =
     let union = nonterm_i ++ sigma ++ ['#']
@@ -81,6 +87,25 @@ alg41 n_prev g
     | n_prev == n_curr = n_curr -- end of algorithm
     | otherwise = alg41 n_curr g
         where n_curr = foldl (\acc (x,y) -> if isRuleInUnion (x,y) n_prev (terminals g) && x `notElem` n_prev then acc ++ [x] else acc) n_prev (rules g)-- vypočítať N_i podľa alg 4.1 krok 2
+
+isRuleFromSet :: Rule -> [Symbol] -> [Symbol] -> Bool
+isRuleFromSet r n t =
+    let union = n ++ t ++ ['#']
+    in fst r `elem` n && foldl (\acc x -> acc && x `elem` union) True (snd r)
+
+getAllRulesFromSet :: [Rule] -> [Symbol] -> [Symbol] -> [Rule]
+getAllRulesFromSet rs n t = filter (\x -> isRuleFromSet x n t) rs
+
+alg43_1 :: BKG -> BKG
+alg43_1 g =
+    let n_t = alg41 [] g
+        p1  = getAllRulesFromSet (rules g) n_t (terminals g)
+        n_new = if startSymbol g `elem` n_t then n_t else startSymbol g : n_t
+    in BKG { nonterminals=n_new
+           , terminals=terminals g
+           , rules=p1
+           , startSymbol=startSymbol g
+           }
 
 main = do
     putStrLn "FLP - Simplify"
