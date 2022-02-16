@@ -96,6 +96,41 @@ isRuleFromSet r n t =
 getAllRulesFromSet :: [Rule] -> [Symbol] -> [Symbol] -> [Rule]
 getAllRulesFromSet rs n t = filter (\x -> isRuleFromSet x n t) rs
 
+removeDuplicates :: (Eq a) => [a] -> [a]
+removeDuplicates list = remDups list []
+
+remDups :: (Eq a) => [a] -> [a] -> [a]
+remDups [] _ = []
+remDups (x:xs) list2
+    | x `elem` list2 = remDups xs list2
+    | otherwise = x : remDups xs (x:list2)
+
+-- get mutual elements from lists
+mutual :: Eq a => [a] -> [a] -> [a]
+mutual [] _ = []
+mutual (x:xs) ys
+    | x `elem` ys = x : mutual xs ys
+    | otherwise   = mutual xs ys
+
+-- TODO - fakt vymyslieť lepšie mená
+alg42_vi :: [Symbol] -> BKG -> [Symbol]
+alg42_vi v_prev g
+    | v_prev == v_curr = v_curr -- end of algorithm
+    | otherwise = alg42_vi v_curr g
+        where v_curr = removeDuplicates (concatMap snd (filter (\(x,y) -> x `elem` v_prev) (rules g)) ++ v_prev)
+
+alg42 :: BKG -> BKG
+alg42 g =
+    let v_t   = alg42_vi [startSymbol g] g
+        n_new = mutual v_t (nonterminals g) -- new nonterminals
+        t_new = mutual v_t (terminals g) -- new terminals
+        r_new = getAllRulesFromSet (rules g) v_t v_t-- new rules
+    in BKG { nonterminals=n_new
+           , terminals=t_new
+           , rules=r_new
+           , startSymbol=startSymbol g
+           }
+
 alg43_1 :: BKG -> BKG
 alg43_1 g =
     let n_t = alg41 [] g
@@ -106,6 +141,9 @@ alg43_1 g =
            , rules=p1
            , startSymbol=startSymbol g
            }
+
+alg43_full :: BKG -> BKG
+alg43_full = alg42 . alg43_1
 
 main = do
     putStrLn "FLP - Simplify"
