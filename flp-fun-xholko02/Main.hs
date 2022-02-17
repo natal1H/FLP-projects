@@ -23,38 +23,6 @@ instance Show BKG where
                         "P = {" ++  intercalate "," (map (\(x, y) -> "(" ++ [x] ++ "," ++ y ++ ")") p) ++ "}\n" ++
                         "S = " ++ [s]
 
-{-- 
--- Cmd line arg parsing
-
--- dispatch association list - takes arg list as param and returns IO action
-dispatch :: [(String, [String] -> IO())]
-dispatch = [ ("-i", onlyDisplay) -- TODO: find a better name
-           , ("-1", firstPart) -- TODO: find a better name
-           , ("-2", completeConvert) -- TODO: find a better name
-           ]
-
-onlyDisplay :: [String] -> IO ()
-onlyDisplay [fileName] = do
-    putStrLn "Chosen option -i"
-
-firstPart :: [String] -> IO ()
-firstPart [fileName] = do
-    putStrLn "Chosen option -1"
-
-completeConvert :: [String] -> IO ()
-completeConvert [fileName] = do
-    putStrLn "Chosen option -2"
-
-main = do
-    (command:args) <- getArgs -- command should be -i/-1/-2
-    let (Just action) = lookup command dispatch -- lookup command in dispatch list
-    action args -- will return IO action
---}
-
-
--- Algoritmus 1
---algoritmus1 :: BKG -> [Symbol]
---algoritmus1 = ...
 
 -- example grammar
 g1 :: BKG
@@ -145,5 +113,33 @@ alg43_1 g =
 alg43_full :: BKG -> BKG
 alg43_full = alg42 . alg43_1
 
+-- Cmd line arg parsing
+
+-- dispatch association list - takes arg list as param and returns IO action
+dispatch :: [(String, [String] -> IO())]
+dispatch = [ ("-i", onlyDisplay) -- TODO: find a better name
+           , ("-1", firstPart) -- TODO: find a better name
+           , ("-2", completeConvert) -- TODO: find a better name
+           ]
+
+onlyDisplay :: [String] -> IO ()
+onlyDisplay [fileName] = do
+    putStrLn "Chosen option -i"
+    putStrLn (show g2)
+
+firstPart :: [String] -> IO ()
+firstPart [fileName] = do
+    putStrLn "Chosen option -1"
+    putStrLn (show (alg43_1 g2))
+
+
+completeConvert :: [String] -> IO ()
+completeConvert [fileName] = do
+    putStrLn "Chosen option -2"
+    putStrLn (show (alg43_full g2))
+
 main = do
-    putStrLn "FLP - Simplify"
+    (command:args) <- getArgs -- command should be -i/-1/-2
+    let (Just action) = lookup command dispatch -- lookup command in dispatch list
+    action args -- will return IO action
+
