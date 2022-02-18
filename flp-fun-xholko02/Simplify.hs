@@ -1,26 +1,10 @@
 module Simplify
-( g1 -- TODO remove
-, g2 -- TODO remove
-, alg43_1
+( alg43_1
 , alg43_full
 ) where
 
 import Types
 
--- example grammar
-g1 :: BKG
-g1 = BKG { nonterminals="SAB"
-        , terminals="abcd"
-        , rules=[('S', "#"), ('S', "AB"), ('A', "aAb"), ('A', "ab"), ('B', "cBd"), ('B', "cd")]
-        , startSymbol='S'}
-
-g2 :: BKG
-g2 = BKG { nonterminals="SAB"
-        , terminals="ab"
-        , rules=[('S', "A"), ('S', "a"), ('A', "AB"), ('B', "b")]
-        , startSymbol='S'}
-
-r1 = [('S', "#"), ('S', "AB"), ('A', "aAb"), ('A', "ab"), ('B', "cBd"), ('B', "cd")]
 
 -- Funkcia pre Alg 4.1 - kontrola či alpha in (Ni-1 union Sigma)*
 -- TODO - prerobiť, že vstup iba alpha, nie A->alpha, lebo isRuleFromSet kontroluje aj A

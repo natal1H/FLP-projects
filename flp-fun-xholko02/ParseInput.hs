@@ -1,8 +1,9 @@
 module ParseInput
 ( dispatch
-, readFromFileBKG
+, readFromStdinBKG
 ) where
 
+import System.IO
 import Data.List
 import Data.List.Split
 import Simplify
@@ -22,13 +23,33 @@ readFromFileBKG filename = do
                                    rightSide = splited !! 1
                                in (leftSide,rightSide)) rulesStrs
     let grammar = BKG { nonterminals=nonterms
-        , terminals=terms
-        , rules=rulesTpls
-        , startSymbol=startSym}
+                      , terminals=terms
+                      , rules=rulesTpls
+                      , startSymbol=startSym
+                      }
     return grammar
 
--- Cmd line arg parsing
+-- To keep correct order
+prompt :: String -> IO String
+prompt text = do
+    putStr text
+    hFlush stdout
+    getLine
 
+-- Reading grammar from stdin
+readFromStdinBKG :: IO ()
+readFromStdinBKG = do
+    nonterminalsLine <- prompt "Nonterminal symbols (e.g. S,A,B): "
+    terminalsLine <- prompt "Terminal symbols (e.g. a,b): "
+    startSymbolLine <- prompt "Starting symbol (e.g. S): "
+    let nonterms = concat $ splitOn "," nonterminalsLine
+        terms    = concat $ splitOn "," terminalsLine
+        startSym = head startSymbolLine
+    putStrLn nonterms
+    putStrLn terms
+    print startSym
+
+-- Cmd line arg parsing
 -- dispatch association list - takes arg list as param and returns IO action
 dispatch :: [(String, [String] -> IO())]
 dispatch = [ ("-i", onlyDisplay) -- TODO: find a better name
