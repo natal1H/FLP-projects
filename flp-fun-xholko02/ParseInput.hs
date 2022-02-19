@@ -37,17 +37,25 @@ prompt text = do
     getLine
 
 -- Reading grammar from stdin
-readFromStdinBKG :: IO ()
+readFromStdinBKG :: IO BKG
 readFromStdinBKG = do
-    nonterminalsLine <- prompt "Nonterminal symbols (e.g. S,A,B): "
-    terminalsLine <- prompt "Terminal symbols (e.g. a,b): "
-    startSymbolLine <- prompt "Starting symbol (e.g. S): "
-    let nonterms = concat $ splitOn "," nonterminalsLine
-        terms    = concat $ splitOn "," terminalsLine
-        startSym = head startSymbolLine
-    putStrLn nonterms
-    putStrLn terms
-    print startSym
+    putStrLn "Enter context-free grammar:"
+    contents <- getContents
+    let allLines  = lines contents
+        nonterms  = concat $ splitOn "," (allLines !! 0)
+        terms     = concat $ splitOn "," (allLines !! 1)
+        startSym  = head (allLines !! 2)
+        rulesStrs = take (length allLines - 3) $ drop 3 allLines -- list of rules in string form
+        rulesTpls = map (\x -> let splited = splitOn "->" x
+                                   leftSide  = head (splited !! 0)
+                                   rightSide = splited !! 1
+                               in (leftSide,rightSide)) rulesStrs
+    let grammar = BKG { nonterminals=nonterms
+                      , terminals=terms
+                      , rules=rulesTpls
+                      , startSymbol=startSym
+                      }
+    return grammar
 
 -- Cmd line arg parsing
 -- dispatch association list - takes arg list as param and returns IO action
@@ -60,7 +68,8 @@ dispatch = [ ("-i", onlyDisplay) -- TODO: find a better name
 onlyDisplay :: [String] -> IO ()
 onlyDisplay [] = do
     putStrLn "Chosen option -i from stdin"
-    -- TODO: read from stdin
+    grammar <- readFromStdinBKG
+    print grammar
 onlyDisplay (fileName:_) = do
     putStrLn "Chosen option -i from file"
     grammar <- readFromFileBKG fileName
@@ -69,7 +78,8 @@ onlyDisplay (fileName:_) = do
 firstPart :: [String] -> IO ()
 firstPart [] = do
     putStrLn "Chosen option -1 from stdin"
-    -- TODO: read from stdin
+    grammar <- readFromStdinBKG
+    print (alg43_1 grammar)
 firstPart (fileName:_) = do
     putStrLn "Chosen option -1 from file"
     grammar <- readFromFileBKG fileName
@@ -79,7 +89,8 @@ firstPart (fileName:_) = do
 completeConvert :: [String] -> IO ()
 completeConvert [] = do
     putStrLn "Chosen option -2 from stdin"
-    -- TODO: read from stdin
+    grammar <- readFromStdinBKG
+    print (alg43_full grammar)
 completeConvert (fileName:_) = do
     putStrLn "Chosen option -2 from file"
     grammar <- readFromFileBKG fileName
