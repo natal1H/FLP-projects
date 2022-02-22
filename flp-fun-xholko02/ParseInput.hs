@@ -1,3 +1,9 @@
+-- Projekt: FLP - simplify-bkg
+-- Autor:   Natália Holková (xholko02)
+-- Dátum:   -.-.2022
+-- Súbor:   ParseInput.hs
+-- Popis:   Načítanie argumentov z príkazového riadku a bezkontextovej gramatiky
+
 module ParseInput
 ( dispatch
 , readFromStdinBKG

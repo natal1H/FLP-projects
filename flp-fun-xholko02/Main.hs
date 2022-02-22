@@ -1,3 +1,9 @@
+-- Projekt: FLP - simplify-bkg
+-- Autor:   Natália Holková (xholko02)
+-- Dátum:   -.-.2022
+-- Súbor:   Main.hs
+-- Popis:   Hlavný súbor
+
 import System.IO
 import System.Directory
 import System.Environment

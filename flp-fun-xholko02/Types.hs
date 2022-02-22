@@ -5,9 +5,13 @@ module Types
 ) where
 
 import Data.List
+-- Projekt: FLP - simplify-bkg
+-- Autor:   Natália Holková (xholko02)
+-- Dátum:   -.-.2022
+-- Súbor:   Types.hs
+-- Popis:   Vlastné dátové typy pre bezkontextovú gramatiku
 
 -- Custom structures
-
 type Symbol = Char -- (Non)terminal symbol
 type Rule = (Symbol, [Symbol]) -- Context-free grammar rule
 

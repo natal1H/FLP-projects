@@ -1,3 +1,9 @@
+-- Projekt: FLP - simplify-bkg
+-- Autor:   Natália Holková (xholko02)
+-- Dátum:   -.-.2022
+-- Súbor:   Simplify.hs
+-- Popis:   Algoritmus na odstránenie zbytočných symbolov z bezkontextovej gramatiky
+
 module Simplify
 ( alg43_1
 , alg43_full
