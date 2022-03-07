@@ -9,8 +9,6 @@ module ParseInput
 , readFromStdinBKG
 ) where
 
-import System.IO
-import Data.List
 import Data.List.Split
 import Simplify
 import Types
@@ -34,13 +32,6 @@ readFromFileBKG filename = do
                       , startSymbol=startSym
                       }
     return grammar
-
--- To keep correct order
-prompt :: String -> IO String
-prompt text = do
-    putStr text
-    hFlush stdout
-    getLine
 
 -- Reading grammar from stdin
 readFromStdinBKG :: IO BKG

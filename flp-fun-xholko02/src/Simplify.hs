@@ -20,9 +20,6 @@ isRuleInUnion rule_i nonterm_i sigma =
     in foldl (\acc x -> acc && x `elem` union) True (snd rule_i)
 
 -- funkcia z Alg 4.1.
-alg41Helper :: [Symbol] -> BKG -> [Symbol]
-alg41Helper n_prev g = foldl (\acc (x,y) -> if isRuleInUnion (x,y) n_prev (terminals g) && x `notElem` n_prev then acc ++ [x] else acc) n_prev (rules g)
-
 alg41 :: [Symbol] -> BKG -> [Symbol]
 alg41 n_prev g
     | n_prev == n_curr = n_curr -- end of algorithm
@@ -58,7 +55,7 @@ alg42_vi :: [Symbol] -> BKG -> [Symbol]
 alg42_vi v_prev g
     | v_prev == v_curr = v_curr -- end of algorithm
     | otherwise = alg42_vi v_curr g
-        where v_curr = removeDuplicates (concatMap snd (filter (\(x,y) -> x `elem` v_prev) (rules g)) ++ v_prev)
+        where v_curr = removeDuplicates (concatMap snd (filter (\(x,_) -> x `elem` v_prev) (rules g)) ++ v_prev)
 
 alg42 :: BKG -> BKG
 alg42 g =

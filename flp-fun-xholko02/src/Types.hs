@@ -23,8 +23,7 @@ data BKG = BKG { nonterminals :: [Symbol] -- list of nonterminal
                }
 
 instance Show BKG where
-   show (BKG n t p s) = "BKG = (N, \x03A3, P, S)\n" ++
-                        "N = {" ++ intercalate "," (map (:[]) n) ++ "}\n" ++
-                        "\x03A3 = {" ++ intercalate "," (map (:[]) t) ++ "}\n" ++
-                        "P = {" ++  intercalate "," (map (\(x, y) -> "(" ++ [x] ++ "," ++ y ++ ")") p) ++ "}\n" ++
-                        "S = " ++ [s]
+   show (BKG n t p s) =  intercalate "," (map (:[]) n) ++ "\n" ++ -- neterminálne symboly
+                         intercalate "," (map (:[]) t) ++ "\n" ++ -- terminálne symbol
+                         [s] ++ "\n" ++ -- počiatočný symbol
+                         intercalate "\n" (map (\(x, y) -> [x] ++ "->" ++ y) p)

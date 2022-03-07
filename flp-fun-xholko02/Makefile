@@ -2,8 +2,8 @@ EXECUTABLE = flp21-fun
 
 all: $(EXECUTABLE)
 
-$(EXECUTABLE): Main.hs Types.hs ParseInput.hs Simplify.hs
-	ghc -o $(EXECUTABLE) Main.hs Types.hs ParseInput.hs Simplify.hs
+$(EXECUTABLE): src/Main.hs src/Types.hs src/ParseInput.hs src/Simplify.hs
+	ghc -Wall -o $(EXECUTABLE) src/Main.hs src/Types.hs src/ParseInput.hs src/Simplify.hs
 
 clean:
-	rm -f $(EXECUTABLE) Main.o Main.hi Types.o Types.hi ParseInput.o ParseInput.hi Simplify.o Simplify.hi
+	rm -f $(EXECUTABLE) src/Main.o src/Main.hi src/Types.o src/Types.hi src/ParseInput.o src/ParseInput.hi src/Simplify.o src/Simplify.hi
