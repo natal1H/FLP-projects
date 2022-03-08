@@ -1,0 +1,12 @@
+Testy sú všetky súbory v adresáry test/ s príponou .in.
+Súbory v zložke test/ s koncom -1.out predstavujú správne výstupy po aplikácii prvej časti algoritmu.
+Súbort v zložke test/ s koncom -2.out predstavujú správne výstupy po kompletnej aplikácii algoritmu. 
+
+Zoznam testovacích súborov:
+    - test/test01.in - BKG zo zadania projektu varianta SIMPLIFY-BKG
+    - test/test02.in - BKG zo zadania projektu varianta BKG-2-CNF
+    - test/test03.in - BKG zo zbierky úlohe pre TIN kapitola 10/2a
+    - test/test04.in - vlastný test 1 na neterminál negenerujúci terminály
+    - test/test05.in - vlastný test 2 na nedostupný symbol
+    - test/test06.in - vlastný test 3 na zbytočný terminál
+    - tets/test07.in - BKG zo študijnej opory TIN kapitola 4/príklad 4.12

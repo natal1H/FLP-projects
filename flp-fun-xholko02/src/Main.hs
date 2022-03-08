@@ -4,11 +4,12 @@
 -- Súbor:   Main.hs
 -- Popis:   Hlavný súbor
 
-import System.Environment
-import ParseInput
+import System.Environment ( getArgs )
+import ParseInput ( dispatch )
 
+-- Hlavná funkcia main
 main :: IO ()
 main = do
-    (command:args) <- getArgs -- command should be -i/-1/-2
-    let (Just action) = lookup command dispatch -- lookup command in dispatch list
-    action args -- will return IO action
+    (command:args) <- getArgs -- argument by mal byť -i/-1/-2
+    let (Just action) = lookup command dispatch -- vyhľadať príkaz v dispatch zozname
+    action args -- vypíše vrátenú IO String

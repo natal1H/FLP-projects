@@ -5,27 +5,27 @@
 -- Popis:   Algoritmus na odstránenie zbytočných symbolov z bezkontextovej gramatiky
 
 module Simplify
-( alg43_1
-, alg43_full
+( algorithm43Partial
+, algorithm43Full
 ) where
 
 import Types
 
 
--- Funkcia pre Alg 4.1 - kontrola či alpha in (Ni-1 union Sigma)*
--- TODO - prerobiť, že vstup iba alpha, nie A->alpha, lebo isRuleFromSet kontroluje aj A
+-- Funkcia pre Alg 4.1 - pre pravidlo A->alpha kontrola či alpha je v (Ni-1 zjednotenie Sigma)*
 isRuleInUnion :: Rule -> [Symbol] -> [Symbol] -> Bool
 isRuleInUnion rule_i nonterm_i sigma =
     let union = nonterm_i ++ sigma ++ ['#']
     in foldl (\acc x -> acc && x `elem` union) True (snd rule_i)
 
--- funkcia z Alg 4.1.
-alg41 :: [Symbol] -> BKG -> [Symbol]
-alg41 n_prev g
-    | n_prev == n_curr = n_curr -- end of algorithm
-    | otherwise = alg41 n_curr g
+-- Funkcia implementujúca algoritmus 4.1 z opory TIN
+algorithm41 :: [Symbol] -> BKG -> [Symbol]
+algorithm41 n_prev g
+    | n_prev == n_curr = n_curr -- ukončujúca podmienka algoritmu
+    | otherwise = algorithm41 n_curr g
         where n_curr = foldl (\acc (x,y) -> if isRuleInUnion (x,y) n_prev (terminals g) && x `notElem` n_prev then acc ++ [x] else acc) n_prev (rules g)-- vypočítať N_i podľa alg 4.1 krok 2
 
+--
 isRuleFromSet :: Rule -> [Symbol] -> [Symbol] -> Bool
 isRuleFromSet r n t =
     let union = n ++ t ++ ['#']
@@ -51,15 +51,15 @@ mutual (x:xs) ys
     | otherwise   = mutual xs ys
 
 -- TODO - fakt vymyslieť lepšie mená
-alg42_vi :: [Symbol] -> BKG -> [Symbol]
-alg42_vi v_prev g
+algorithm42Helper :: [Symbol] -> BKG -> [Symbol]
+algorithm42Helper v_prev g
     | v_prev == v_curr = v_curr -- end of algorithm
-    | otherwise = alg42_vi v_curr g
+    | otherwise = algorithm42Helper v_curr g
         where v_curr = removeDuplicates (concatMap snd (filter (\(x,_) -> x `elem` v_prev) (rules g)) ++ v_prev)
 
-alg42 :: BKG -> BKG
-alg42 g =
-    let v_t   = alg42_vi [startSymbol g] g
+algorithm42 :: BKG -> BKG
+algorithm42 g =
+    let v_t   = algorithm42Helper [startSymbol g] g
         n_new = mutual v_t (nonterminals g) -- new nonterminals
         t_new = mutual v_t (terminals g) -- new terminals
         r_new = getAllRulesFromSet (rules g) v_t v_t-- new rules
@@ -69,9 +69,9 @@ alg42 g =
            , startSymbol=startSymbol g
            }
 
-alg43_1 :: BKG -> BKG
-alg43_1 g =
-    let n_t = alg41 [] g
+algorithm43Partial :: BKG -> BKG
+algorithm43Partial g =
+    let n_t = algorithm41 [] g
         p1  = getAllRulesFromSet (rules g) n_t (terminals g)
         n_new = if startSymbol g `elem` n_t then n_t else startSymbol g : n_t
     in BKG { nonterminals=n_new
@@ -80,5 +80,5 @@ alg43_1 g =
            , startSymbol=startSymbol g
            }
 
-alg43_full :: BKG -> BKG
-alg43_full = alg42 . alg43_1
+algorithm43Full :: BKG -> BKG
+algorithm43Full = algorithm42 . algorithm43Partial

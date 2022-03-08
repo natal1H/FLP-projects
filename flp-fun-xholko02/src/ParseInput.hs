@@ -9,11 +9,11 @@ module ParseInput
 , readFromStdinBKG
 ) where
 
-import Data.List.Split
-import Simplify
-import Types
+import Data.List.Split ( splitOn )
+import Simplify ( algorithm43Partial, algorithm43Full )
+import Types ( BKG(..) )
 
--- Reading grammar from file
+-- Načíta BKG zo súboru
 readFromFileBKG :: String -> IO BKG
 readFromFileBKG filename = do
     contents <- readFile filename
@@ -21,7 +21,7 @@ readFromFileBKG filename = do
         nonterms  = concat $ splitOn "," (allLines !! 0)
         terms     = concat $ splitOn "," (allLines !! 1)
         startSym  = head (allLines !! 2)
-        rulesStrs = take (length allLines - 3) $ drop 3 allLines -- list of rules in string form
+        rulesStrs = take (length allLines - 3) $ drop 3 allLines -- zoznam pravidiel vo forme reťazcov
         rulesTpls = map (\x -> let splited = splitOn "->" x
                                    leftSide  = head (splited !! 0)
                                    rightSide = splited !! 1
@@ -33,16 +33,15 @@ readFromFileBKG filename = do
                       }
     return grammar
 
--- Reading grammar from stdin
+-- Načíta BKG zo stdin, požaduje rovnaký formát ako v súbore
 readFromStdinBKG :: IO BKG
 readFromStdinBKG = do
-    putStrLn "Enter context-free grammar:"
     contents <- getContents
     let allLines  = lines contents
         nonterms  = concat $ splitOn "," (allLines !! 0)
         terms     = concat $ splitOn "," (allLines !! 1)
         startSym  = head (allLines !! 2)
-        rulesStrs = take (length allLines - 3) $ drop 3 allLines -- list of rules in string form
+        rulesStrs = take (length allLines - 3) $ drop 3 allLines -- zoznam pravidiel vo forme reťazcov
         rulesTpls = map (\x -> let splited = splitOn "->" x
                                    leftSide  = head (splited !! 0)
                                    rightSide = splited !! 1
@@ -54,41 +53,25 @@ readFromStdinBKG = do
                       }
     return grammar
 
--- Cmd line arg parsing
--- dispatch association list - takes arg list as param and returns IO action
+-- Spracovanie argumentov z príkazového riadku
+-- dispatch association zoznam - berie zoznam argumentov ako parameter a vracia IO action
 dispatch :: [(String, [String] -> IO())]
-dispatch = [ ("-i", onlyDisplay) -- TODO: find a better name
-           , ("-1", firstPart) -- TODO: find a better name
-           , ("-2", completeConvert) -- TODO: find a better name
+dispatch = [ ("-i", printGrammarUnchanged)
+           , ("-1", printGrammarPartiallyConverted)
+           , ("-2", printGrammarCompletelyConverted)
            ]
 
-onlyDisplay :: [String] -> IO ()
-onlyDisplay [] = do
-    putStrLn "Chosen option -i from stdin"
-    grammar <- readFromStdinBKG
-    print grammar
-onlyDisplay (fileName:_) = do
-    putStrLn "Chosen option -i from file"
-    grammar <- readFromFileBKG fileName
-    print grammar
+-- Načíta BKG, vnútorne ju spracuje a vypíše na stdout nezmenenú
+printGrammarUnchanged :: [String] -> IO ()
+printGrammarUnchanged [] = readFromStdinBKG >>= print
+printGrammarUnchanged (fileName:_) = readFromFileBKG fileName >>= print
 
-firstPart :: [String] -> IO ()
-firstPart [] = do
-    putStrLn "Chosen option -1 from stdin"
-    grammar <- readFromStdinBKG
-    print (alg43_1 grammar)
-firstPart (fileName:_) = do
-    putStrLn "Chosen option -1 from file"
-    grammar <- readFromFileBKG fileName
-    print (alg43_1 grammar)
+-- Načíta BKG, vnútorne ju spracuje a vypíše BKG bez neterminálov, ktoré negenerujú terminály (1. časť algoritmu)
+printGrammarPartiallyConverted :: [String] -> IO ()
+printGrammarPartiallyConverted [] = readFromStdinBKG >>= print . algorithm43Partial
+printGrammarPartiallyConverted (fileName:_) = readFromFileBKG fileName >>= print . algorithm43Partial
 
-
-completeConvert :: [String] -> IO ()
-completeConvert [] = do
-    putStrLn "Chosen option -2 from stdin"
-    grammar <- readFromStdinBKG
-    print (alg43_full grammar)
-completeConvert (fileName:_) = do
-    putStrLn "Chosen option -2 from file"
-    grammar <- readFromFileBKG fileName
-    print (alg43_full grammar)
+-- Načíta BKG, vnútorne ju spracuje a vypíše BKG bez zbytočných symbolov (kompletný algoritmus)
+printGrammarCompletelyConverted :: [String] -> IO ()
+printGrammarCompletelyConverted [] = readFromStdinBKG >>= print . algorithm43Full
+printGrammarCompletelyConverted (fileName:_) = readFromFileBKG fileName >>= print . algorithm43Full

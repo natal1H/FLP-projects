@@ -1,25 +1,26 @@
-module Types
-( Symbol
-, Rule
-, BKG (..)
-) where
-
-import Data.List
 -- Projekt: FLP - simplify-bkg
 -- Autor:   Natália Holková (xholko02)
 -- Dátum:   -.-.2022
 -- Súbor:   Types.hs
 -- Popis:   Vlastné dátové typy pre bezkontextovú gramatiku
 
--- Custom structures
-type Symbol = Char -- (Non)terminal symbol
-type Rule = (Symbol, [Symbol]) -- Context-free grammar rule
+module Types
+( Symbol
+, Rule
+, BKG (..)
+) where
+
+import Data.List ( intercalate )
+
+-- Vlastné štruktúry
+type Symbol = Char -- (Ne)terminálny symbol
+type Rule = (Symbol, [Symbol]) -- pravidlo bezkontextovej gramatiky
 
 --- BKG G = (N, eps, P, S)
-data BKG = BKG { nonterminals :: [Symbol] -- list of nonterminal
-               , terminals    :: [Symbol] -- list of termimal symbols
-               , rules        :: [Rule]   -- list of rules
-               , startSymbol  :: Symbol   -- starting nonterminal symbol
+data BKG = BKG { nonterminals :: [Symbol] -- zoznam neterminálnych symbolov 
+               , terminals    :: [Symbol] -- zoznam terminlálnych symbolov
+               , rules        :: [Rule]   -- zoznam pravidiel
+               , startSymbol  :: Symbol   -- počiatočný neterminálny symbol
                }
 
 instance Show BKG where
