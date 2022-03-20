@@ -13,7 +13,7 @@ module ParseInput
 
 import Data.List.Split ( splitOn )
 import Simplify ( algorithm43Partial, algorithm43Full )
-import Types ( BKG(..) )
+import Types ( BKG(..), isBKGValid )
 import System.Directory ( doesFileExist )
 
 -- Povolené prepínače
@@ -45,18 +45,25 @@ parseBKGFromString contents =
                       , rules=rulesTpls
                       , startSymbol=startSym
                       }
-        in grammar
+    in grammar
 
 -- Načíta BKG zo súboru
 readFromFileBKG :: String -> IO BKG
 readFromFileBKG filename = do
     contents <- readFile filename
-    return (parseBKGFromString contents)
+    let grammar = parseBKGFromString contents
+    if isBKGValid grammar
+        then return grammar
+        else error "Invalid grammar!"
 
 -- Načíta BKG zo stdin, požaduje rovnaký formát ako v súbore
 readFromStdinBKG :: IO BKG
 readFromStdinBKG = do
-    parseBKGFromString <$> getContents
+    contents <- getContents
+    let grammar = parseBKGFromString contents
+    if isBKGValid grammar
+        then return grammar
+        else error "Invalid grammar!"
 
 -- Spracovanie argumentov z príkazového riadku
 -- dispatch association zoznam - berie zoznam argumentov ako parameter a vracia IO action
@@ -71,7 +78,7 @@ printGrammarUnchanged :: [String] -> IO ()
 printGrammarUnchanged [] = readFromStdinBKG >>= print
 printGrammarUnchanged (fileName:_) = do
     fileExists <- doesFileExist fileName  -- Kontrola či existuje súbor
-    if fileExists  
+    if fileExists
         then readFromFileBKG fileName >>= print
         else error $ "File " ++ fileName ++ " does not exist!"
 
@@ -80,15 +87,15 @@ printGrammarPartiallyConverted :: [String] -> IO ()
 printGrammarPartiallyConverted [] = readFromStdinBKG >>= print . algorithm43Partial
 printGrammarPartiallyConverted (fileName:_) = do
     fileExists <- doesFileExist fileName  -- Kontrola či existuje súbor
-    if fileExists  
+    if fileExists
         then readFromFileBKG fileName >>= print . algorithm43Partial
         else error $ "File " ++ fileName ++ " does not exist!"
 
 -- Načíta BKG, vnútorne ju spracuje a vypíše BKG bez zbytočných symbolov (kompletný algoritmus)
 printGrammarCompletelyConverted :: [String] -> IO ()
 printGrammarCompletelyConverted [] = readFromStdinBKG >>= print . algorithm43Full
-printGrammarCompletelyConverted (fileName:_) = do 
+printGrammarCompletelyConverted (fileName:_) = do
     fileExists <- doesFileExist fileName  -- Kontrola či existuje súbor
-    if fileExists  
+    if fileExists
         then readFromFileBKG fileName >>= print . algorithm43Full
         else error $ "File " ++ fileName ++ " does not exist!"

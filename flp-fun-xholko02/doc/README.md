@@ -2,10 +2,8 @@
 
 ## SIMPLIFY-BKG
 
----
-
-**Autor:** Natália Holková
-**Login:** xholko02
+- **Autor:** Natália Holková
+- **Login:** xholko02
 
 ### Popis úlohy
 
