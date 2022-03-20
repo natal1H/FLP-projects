@@ -9,7 +9,7 @@ module Simplify
 , algorithm43Full
 ) where
 
-import Types
+import Types ( BKG(..), Rule, Symbol )
 
 
 -- Funkcia pre Alg 4.1 - pre pravidlo A->alpha kontrola či alpha je v (Ni-1 zjednotenie Sigma)*
